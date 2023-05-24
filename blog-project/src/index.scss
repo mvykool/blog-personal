@@ -1,12 +1,14 @@
-html {
-    background-color: rgb(107, 107, 107);
-    color: aliceblue;
-    padding: 0;
-    margin: 0;
-}
-
+$lightGreen: #23c4c4;
 .app {
     .container {
         //login and register
+        .auth {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: $lightGreen;
+        }
     }
 }

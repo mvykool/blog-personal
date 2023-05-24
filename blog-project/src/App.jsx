@@ -15,6 +15,8 @@ import Login from "./pages/Login";
 
 // set layout properties
 
+import "./index.scss";
+
 
 const Layout = () => {
   return (
@@ -63,9 +65,11 @@ const router= createBrowserRouter([
 function App() {
 
   return (
-    <>
-    <RouterProvider router={router} />
-    </>
+    <div className="app">
+      <div className="container">
+      <RouterProvider router={router} />
+      </div>
+    </div>
   )
 }
 
