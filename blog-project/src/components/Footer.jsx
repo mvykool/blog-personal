@@ -1,8 +1,11 @@
-import React from 'react'
+
 
 const Footer = () => {
   return (
-	<div>Footer</div>
+	<footer>
+   <h1>LOGO</h1>
+   <span>Made with love and reactjs</span>
+  </footer>
   )
 }
 
