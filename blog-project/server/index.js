@@ -4,6 +4,7 @@ import express from "express";
 import postRoutes from "./routes/posts.js";
 import usersRoutes from "./routes/users.js";
 import authRoutes from "./routes/auth.js";
+import cookieParser from "cookie-parser";
 
 //starting express
 const app = express();
@@ -15,6 +16,9 @@ app.use(cors());
 
 //allowing client to send json
 app.use(express.json());
+
+//middleware for using cookies
+app.use(cookieParser())
 
 //use routes routes
 app.use("/api/auth", authRoutes)
