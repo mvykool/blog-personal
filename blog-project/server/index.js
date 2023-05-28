@@ -8,6 +8,11 @@ import authRoutes from "./routes/auth.js";
 //starting express
 const app = express();
 
+import cors from "cors";
+
+//set cors
+app.use(cors());
+
 //allowing client to send json
 app.use(express.json());
 
