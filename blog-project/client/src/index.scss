@@ -58,6 +58,7 @@ body {
         }
         //navbar
         .navbar {
+            background: $lightGreen;
             .container {
                 padding: 10px 0px;
                 display: flex;
@@ -72,11 +73,11 @@ body {
                 .links {
                     display: flex;
                     align-items: center;
-                    gap: 10px;
+                    gap: 15px;
                 }
                 h6 {
-                    font-size: 16px;
-                    font-weight: 300;
+                    font-size: 14px;
+                    font-weight: 400;
                 }
                 span {
                     cursor: pointer;
