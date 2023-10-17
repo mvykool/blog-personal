@@ -2,7 +2,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 
-
 const Register = () => {
 
   const [inputs, setInputs] = useState({
@@ -18,7 +17,6 @@ const Register = () => {
   const handleChange = (e) => {
     setInputs(prev => ({...prev, [e.target.name]: e.target.value}))
   } 
-
 
   const handleSubmit = async (e) => {
       e.preventDefault()

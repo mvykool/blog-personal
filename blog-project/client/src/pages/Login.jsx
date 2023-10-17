@@ -2,7 +2,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { AuthContext } from "../context/authContext"
 
-
 const Login = () => {
   const [inputs, setInputs] = useState({
     username: "",
@@ -20,7 +19,6 @@ const Login = () => {
   const handleChange = (e) => {
     setInputs(prev => ({...prev, [e.target.name]: e.target.value}))
   } 
-
 
   const handleSubmit = async (e) => {
       e.preventDefault()

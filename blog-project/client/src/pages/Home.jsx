@@ -20,8 +20,6 @@ const Home = () => {
     fetchData();
   }, [cat])
   
-
-
   return (
 	<div className="home">
     <div className="posts">
