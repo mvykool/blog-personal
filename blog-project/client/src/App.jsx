@@ -17,7 +17,6 @@ import Login from "./pages/Login";
 
 import "./index.scss";
 
-
 const Layout = () => {
   return (
     <>
