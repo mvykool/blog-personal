@@ -26,7 +26,7 @@ const posts = [
 ];
 
 const Menu = () => {
-  return (
+return (
 	<div className='menu'>
 		<h1>Other posts you might like</h1>
 		{posts.map((post) => (
@@ -37,7 +37,7 @@ const Menu = () => {
 			</div>
 		))}
 	</div>
-  );
+);
 };
 
 export default Menu
