@@ -1,7 +1,6 @@
-const repoOwner = "mvykool"; // Replace with your GitHub username
-const repoName = "obsidian"; // Replace with your repo name
-const token = import.meta.env.PUBLIC_TOKEN;
+// src/lib/blog.ts
 
+// Define interfaces for the data structures
 interface GitHubFile {
   name: string;
   path: string;
@@ -19,34 +18,31 @@ interface GitHubFile {
   };
 }
 
-interface BlogPostFrontmatter {
-  title?: string;
-  description?: string;
-  date?: string;
-  updated?: string;
-  tags?: string;
-  image?: string;
-  [key: string]: any; // Allow for additional frontmatter fields
-}
-
-interface BlogPost {
+export interface BlogPost {
+  id: string;
   slug: string;
-  title: string;
-  description: string;
-  pubDate: Date;
-  updatedDate?: Date;
-  tags: string[];
-  heroImage?: string;
-  content: string;
-  path: string;
-  html_url: string;
-  download_url: string;
-  sha: string;
+  data: {
+    title: string;
+    description: string;
+    pubDate: Date;
+    updatedDate?: Date;
+    heroImage?: string;
+    tags?: string[];
+  };
+  body: string;
+  render: () => Promise<{ Content: any; headings: any[] }>;
 }
 
-export async function fetchBlogPosts(): Promise<BlogPost[]> {
+const token = import.meta.env.PUBLIC_TOKEN;
+
+export async function getCollection(collection: string): Promise<BlogPost[]> {
+  if (collection !== "blog") {
+    return [];
+  }
+
   try {
     // Fetch the list of files from the GitHub API
+
     const response = await fetch(
       "https://api.github.com/repos/mvykool/obsidian/contents/blog",
       {
@@ -64,11 +60,11 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
 
     const files: GitHubFile[] = await response.json();
 
-    // Fetch the content of each file
+    // Fetch and process each file
     const posts = await Promise.all(
       files.map(async (file): Promise<BlogPost | null> => {
         try {
-          // Use the download_url to get the raw content
+          // Fetch the raw content
           const contentResponse = await fetch(file.download_url);
 
           if (!contentResponse.ok) {
@@ -84,11 +80,10 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
           const frontmatterMatch = content.match(
             /^---\n([\s\S]*?)\n---\n([\s\S]*)$/,
           );
-          let frontmatter: BlogPostFrontmatter = {};
+          let frontmatter: Record<string, any> = {};
           let markdown = content;
 
           if (frontmatterMatch) {
-            // Parse frontmatter
             try {
               const frontmatterText = frontmatterMatch[1];
               frontmatterText.split("\n").forEach((line) => {
@@ -111,24 +106,35 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
             .replace(/\.md$/, "")
             .toLowerCase()
             .replace(/\s+/g, "-");
+          const id = slug;
 
+          // Create a BlogPost object that matches Astro's CollectionEntry format
           return {
+            id,
             slug,
-            title: frontmatter.title || file.name.replace(/\.md$/, ""),
-            description: frontmatter.description || "",
-            pubDate: frontmatter.date ? new Date(frontmatter.date) : new Date(),
-            updatedDate: frontmatter.updated
-              ? new Date(frontmatter.updated)
-              : undefined,
-            tags: frontmatter.tags
-              ? frontmatter.tags.split(",").map((tag) => tag.trim())
-              : [],
-            heroImage: frontmatter.image,
-            content: markdown,
-            path: file.path,
-            html_url: file.html_url,
-            download_url: file.download_url,
-            sha: file.sha,
+            data: {
+              title: frontmatter.title || file.name.replace(/\.md$/, ""),
+              description: frontmatter.description || "",
+              pubDate: frontmatter.pubDate
+                ? new Date(frontmatter.pubDate)
+                : new Date(),
+              updatedDate: frontmatter.updatedDate
+                ? new Date(frontmatter.updatedDate)
+                : undefined,
+              heroImage: frontmatter.heroImage,
+              tags: frontmatter.tags
+                ? frontmatter.tags.split(",").map((tag: string) => tag.trim())
+                : [],
+            },
+            body: processObsidianContent(markdown),
+            render: async () => {
+              // This is a simplified render function that returns the markdown content
+              // You'll need to use a markdown parser in the actual component
+              return {
+                Content: markdown,
+                headings: [],
+              };
+            },
           };
         } catch (error) {
           console.error(`Error processing file ${file.name}:`, error);
@@ -137,7 +143,7 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
       }),
     );
 
-    // Filter out any null values (failed fetches)
+    // Filter out any null values and return the result
     return posts.filter((post): post is BlogPost => post !== null);
   } catch (error) {
     console.error("Error fetching blog posts:", error);
@@ -145,15 +151,16 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
   }
 }
 
-export async function getBlogPostBySlug(
+export async function getEntry(
+  collection: string,
   slug: string,
 ): Promise<BlogPost | undefined> {
-  const posts = await fetchBlogPosts();
-  return posts.find((post) => post.slug === slug);
+  const posts = await getCollection(collection);
+  return posts.find((post) => post.slug === slug || post.id === slug);
 }
 
 // Function to process Obsidian-specific syntax
-export function processObsidianContent(content: string): string {
+function processObsidianContent(content: string): string {
   // Convert [[WikiLinks]] to regular markdown links
   let processed = content.replace(/\[\[(.*?)\]\]/g, (match, linkText) => {
     const displayName = linkText.includes("|")
