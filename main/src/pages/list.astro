@@ -6,14 +6,13 @@ import {marked} from 'marked';
 const logs = await getLogs('logs');
 
 const content = marked(logs.body);
-console.log(logs)
 ---
 
 <Layout
 	title="Logs"
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date('August 08 2021')}
+  description="list of resources, books, link to articles etc"
+	pubDate={new Date()}
 	heroImage="/blog-placeholder-about.jpg"
 >
-    <div set:html={content}></div>
+    <div class="log" set:html={content}></div>
 </Layout>
