@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+:root {
+  --dark-bg: #293136;
+  --bg0: #333c43;
+  --red: #e67e80;
+  --green: #a7c080;
+  --purple: #d699b6;
+  --aqua: #83c092;
+  --blue: #7fbbb3;
+  --op-fg: #d3c6aa;
+}
+
 body {
   font-family: "Anonymous Pro", monospace;
+  background-color: var(--dark-bg);
+}
+
+.log {
+  padding: 1rem 0;
+  h3 {
+    color: var(--red);
+  }
+
+  a {
+    color: var(--aqua);
+  }
 }

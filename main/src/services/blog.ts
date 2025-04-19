@@ -8,7 +8,6 @@ export async function getCollection(collection: string): Promise<BlogPost[]> {
 
   try {
     // Fetch the list of files from the GitHub API
-
     const response = await fetch(
       "https://api.github.com/repos/mvykool/obsidian/contents/blog",
       {
@@ -41,6 +40,29 @@ export async function getCollection(collection: string): Promise<BlogPost[]> {
           }
 
           const content = await contentResponse.text();
+
+          // Get the commit history for this file to find creation/modification date
+          const commitsResponse = await fetch(
+            `https://api.github.com/repos/mvykool/obsidian/commits?path=blog/${file.name}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+              },
+            },
+          );
+
+          let gitHubDate = new Date();
+          if (commitsResponse.ok) {
+            const commits = await commitsResponse.json();
+            if (commits.length > 0) {
+              // Get the date of the first commit (creation date)
+              gitHubDate = new Date(
+                commits[commits.length - 1].commit.author.date,
+              );
+            }
+          }
 
           // Extract frontmatter if it exists
           const frontmatterMatch = content.match(
@@ -83,7 +105,7 @@ export async function getCollection(collection: string): Promise<BlogPost[]> {
               description: frontmatter.description || "",
               pubDate: frontmatter.pubDate
                 ? new Date(frontmatter.pubDate)
-                : new Date(),
+                : gitHubDate,
               updatedDate: frontmatter.updatedDate
                 ? new Date(frontmatter.updatedDate)
                 : undefined,

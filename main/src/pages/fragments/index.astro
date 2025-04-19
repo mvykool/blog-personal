@@ -8,6 +8,7 @@ import { getCollection } from '../../services/blog';
 
 const posts = await getCollection('blog');
 
+console.log(posts[0].data)
 ---
 
 <!doctype html>
@@ -24,7 +25,7 @@ const posts = await getCollection('blog');
 						posts.map((post: any) => (
 							<li>
             <a href={`/fragments/${post.slug}`} class="block hover:shadow-lg transition-shadow duration-300 rounded-lg overflow-hidden p-4 border border-gray-200">
-									<h4 class="title text-rose-400">{post.data.title}</h4>
+									<h4 class="title text-[#e67e80]">{post.data.title}</h4>
 									<p class="date">
 										<FormattedDate date={post.data.pubDate} />
 									</p>
