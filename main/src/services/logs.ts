@@ -1,9 +1,7 @@
-import { token, type BlogPost, type GitHubFile } from "../types";
+import { token, type GitHubFile } from "../types";
 import { processObsidianContent } from "../utils";
 
-export async function getLogs(
-  collection: string,
-): Promise<BlogPost | undefined> {
+export async function getLogs(collection: string): Promise<any | undefined> {
   if (collection !== "logs") {
     return;
   }
@@ -69,22 +67,6 @@ export async function getLogs(
 
     // Create a BlogPost object that matches Astro's CollectionEntry format
     return {
-      id,
-      slug,
-      data: {
-        title: frontmatter.title || file.name.replace(/\.md$/, ""),
-        description: frontmatter.description || "",
-        pubDate: frontmatter.pubDate
-          ? new Date(frontmatter.pubDate)
-          : new Date(),
-        updatedDate: frontmatter.updatedDate
-          ? new Date(frontmatter.updatedDate)
-          : undefined,
-        heroImage: frontmatter.heroImage,
-        tags: frontmatter.tags
-          ? frontmatter.tags.split(",").map((tag: string) => tag.trim())
-          : [],
-      },
       body: processObsidianContent(markdown),
       render: async () => {
         return {
