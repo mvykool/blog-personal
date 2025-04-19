@@ -24,4 +24,7 @@ body {
   a {
     color: var(--aqua);
   }
+  a:hover {
+    text-decoration: underline;
+  }
 }
