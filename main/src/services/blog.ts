@@ -137,7 +137,7 @@ function processObsidianContent(content: string): string {
       ? linkText.split("|")[0]
       : linkText;
     const slug = linkTarget.toLowerCase().replace(/\s+/g, "-");
-    return `[${displayName}](/blog/${slug})`;
+    return `[${displayName}](/fragments/${slug})`;
   });
 
   // Process ![[embedded images]]
