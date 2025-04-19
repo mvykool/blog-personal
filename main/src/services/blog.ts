@@ -1,6 +1,5 @@
-import type { BlogPost, GitHubFile } from "../types";
-
-const token = import.meta.env.PUBLIC_TOKEN;
+import { token, type BlogPost, type GitHubFile } from "../types";
+import { processObsidianContent } from "../utils";
 
 export async function getCollection(collection: string): Promise<BlogPost[]> {
   if (collection !== "blog") {
@@ -124,26 +123,4 @@ export async function getEntry(
 ): Promise<BlogPost | undefined> {
   const posts = await getCollection(collection);
   return posts.find((post) => post.slug === slug || post.id === slug);
-}
-
-// Function to process Obsidian-specific syntax
-function processObsidianContent(content: string): string {
-  // Convert [[WikiLinks]] to regular markdown links
-  let processed = content.replace(/\[\[(.*?)\]\]/g, (match, linkText) => {
-    const displayName = linkText.includes("|")
-      ? linkText.split("|")[1]
-      : linkText;
-    const linkTarget = linkText.includes("|")
-      ? linkText.split("|")[0]
-      : linkText;
-    const slug = linkTarget.toLowerCase().replace(/\s+/g, "-");
-    return `[${displayName}](/fragments/${slug})`;
-  });
-
-  // Process ![[embedded images]]
-  processed = processed.replace(/!\[\[(.*?)\]\]/g, (match, imagePath) => {
-    return `![](${imagePath})`;
-  });
-
-  return processed;
 }

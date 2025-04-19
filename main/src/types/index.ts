@@ -15,6 +15,8 @@ export interface GitHubFile {
   };
 }
 
+export const token = import.meta.env.PUBLIC_TOKEN;
+
 export interface BlogPost {
   id: string;
   slug: string;

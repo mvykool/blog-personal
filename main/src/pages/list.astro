@@ -1,5 +1,10 @@
 ---
 import Layout from '../layouts/BlogPost.astro';
+import { getLogs } from '../services/logs';
+
+const logs = await getLogs('logs');
+
+console.log(logs)
 ---
 
 <Layout
