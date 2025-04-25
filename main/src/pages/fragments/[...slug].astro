@@ -15,7 +15,6 @@ const post = Astro.props;
 
 // Convert markdown to HTML
 const content = marked(post.body);
-console.log(content)
 ---
 
 <BlogPost {...post.data}>
