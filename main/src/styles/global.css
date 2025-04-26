@@ -28,3 +28,36 @@ body {
     text-decoration: underline;
   }
 }
+/* styles/callouts.css */
+.callout {
+  border-left: 4px solid;
+  padding: 1rem;
+  margin: 1rem 0;
+  background-color: #f9f9f9;
+}
+
+.callout-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.callout-note {
+  border-color: #007bff;
+}
+
+.callout-warning {
+  border-color: #ffc107;
+}
+
+.callout-danger {
+  border-color: #dc3545;
+}
+
+.tag {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.tag:hover {
+  text-decoration: underline;
+}

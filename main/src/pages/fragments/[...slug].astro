@@ -1,22 +1,32 @@
 ---
 import BlogPost from '../../layouts/BlogPost.astro';
 import { getCollection } from '../../services/blog';
-import {marked} from 'marked';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  return posts.map((post: any) => ({
+  return posts.map((post) => ({
     params: { slug: post.slug },
-    props: post,
+    props: { post },
   }));
 }
 
-const post = Astro.props;
+const { post } = Astro.props;
 
-// Convert markdown to HTML
-const content = marked(post.body);
+// Call the render function to get parsed content and headings
+const { Content, headings } = await post.render();
 ---
 
 <BlogPost {...post.data}>
-  <div set:html={content}></div>
+  <div set:html={Content}></div>
+  <!-- Optional: Display headings for navigation -->
+  <aside>
+    <h2>Table of Contents</h2>
+    <ul>
+      {headings.map((heading) => (
+        <li>
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+        </li>
+      ))}
+    </ul>
+  </aside>
 </BlogPost>

@@ -1,13 +1,21 @@
+// services/blog.ts
+import { marked } from "marked";
 import { token, type BlogPost, type GitHubFile } from "../types";
 import { processObsidianContent } from "../utils";
+
+// Configure marked
 
 export async function getCollection(collection: string): Promise<BlogPost[]> {
   if (collection !== "blog") {
     return [];
   }
 
+  marked.setOptions({
+    gfm: true, // Enable GitHub Flavored Markdown
+    breaks: true, // Treat line breaks as <br>
+  });
+
   try {
-    // Fetch the list of files from the GitHub API
     const response = await fetch(
       "https://api.github.com/repos/mvykool/obsidian/contents/blog",
       {
@@ -25,13 +33,10 @@ export async function getCollection(collection: string): Promise<BlogPost[]> {
 
     const files: GitHubFile[] = await response.json();
 
-    // Fetch and process each file
     const posts = await Promise.all(
       files.map(async (file): Promise<BlogPost | null> => {
         try {
-          // Fetch the raw content
           const contentResponse = await fetch(file.download_url);
-
           if (!contentResponse.ok) {
             console.error(
               `Failed to fetch content for ${file.name}: ${contentResponse.status}`,
@@ -41,7 +46,6 @@ export async function getCollection(collection: string): Promise<BlogPost[]> {
 
           const content = await contentResponse.text();
 
-          // Get the commit history for this file to find creation/modification date
           const commitsResponse = await fetch(
             `https://api.github.com/repos/mvykool/obsidian/commits?path=blog/${file.name}`,
             {
@@ -57,14 +61,12 @@ export async function getCollection(collection: string): Promise<BlogPost[]> {
           if (commitsResponse.ok) {
             const commits = await commitsResponse.json();
             if (commits.length > 0) {
-              // Get the date of the first commit (creation date)
               gitHubDate = new Date(
                 commits[commits.length - 1].commit.author.date,
               );
             }
           }
 
-          // Extract frontmatter if it exists
           const frontmatterMatch = content.match(
             /^---\n([\s\S]*?)\n---\n([\s\S]*)$/,
           );
@@ -89,14 +91,14 @@ export async function getCollection(collection: string): Promise<BlogPost[]> {
             }
           }
 
-          // Create a slug from the filename
           const slug = file.name
             .replace(/\.md$/, "")
             .toLowerCase()
             .replace(/\s+/g, "-");
           const id = slug;
 
-          // Create a BlogPost object that matches Astro's CollectionEntry format
+          const processedMarkdown = processObsidianContent(markdown);
+
           return {
             id,
             slug,
@@ -114,13 +116,24 @@ export async function getCollection(collection: string): Promise<BlogPost[]> {
                 ? frontmatter.tags.split(",").map((tag: string) => tag.trim())
                 : [],
             },
-            body: processObsidianContent(markdown),
+            body: processedMarkdown,
             render: async () => {
-              // This is a simplified render function that returns the markdown content
-              // You'll need to use a markdown parser in the actual component
+              const htmlContent = marked(processedMarkdown); // Parse Markdown to HTML
+              const lexer = marked.lexer(processedMarkdown);
+              const headings = lexer
+                .filter((token: any) => token.type === "heading")
+                .map((h: any) => ({
+                  depth: h.depth,
+                  text: h.text,
+                  slug: h.text
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^\w-]/g, ""),
+                }));
+
               return {
-                Content: markdown,
-                headings: [],
+                Content: htmlContent, // Return parsed HTML
+                headings,
               };
             },
           };
@@ -131,7 +144,6 @@ export async function getCollection(collection: string): Promise<BlogPost[]> {
       }),
     );
 
-    // Filter out any null values and return the result
     return posts.filter((post): post is BlogPost => post !== null);
   } catch (error) {
     console.error("Error fetching blog posts:", error);
